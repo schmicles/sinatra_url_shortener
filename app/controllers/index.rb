@@ -9,27 +9,27 @@ post '/' do
   @short_url = ShortUrl.new(long_url: long_url)
   @error = ""
   if @short_url.save
-      ShortUrl.create(long_url: long_url)
-      url_id = ShortUrl.where(long_url: long_url).first.id
-      redirect "/result/#{url_id}"
+      generated_url = ShortUrl.where(long_url: long_url).first.generated_url
+      redirect "/result/#{generated_url}"
     else
-      @error =
       erb :index
   end
 end
 
 
-get '/result/:url_id' do
-  @short_url_id = params[:url_id]
-  short_url_object = ShortUrl.where(id: @short_url_id).first
+get '/result/:generated_url' do
+  @generated_url = params[:generated_url]
+  puts @generated_url
+  short_url_object = ShortUrl.where(generated_url: @generated_url).first
+  puts short_url_object.inspect
   @long_url = short_url_object.long_url
   @counter = short_url_object.counter
   erb :result
 end
 
-get '/:url_id' do
-  @short_url_id = params[:url_id]
-  short_url_object = ShortUrl.where(id: @short_url_id).first
+get '/:generated_url' do
+  @generated_url = params[:generated_url]
+  short_url_object = ShortUrl.where(generated_url: @generated_url).first
   @long_url = short_url_object.long_url
   short_url_object.counter += 1
   short_url_object.save
